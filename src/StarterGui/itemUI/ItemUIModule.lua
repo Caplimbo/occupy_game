@@ -19,15 +19,12 @@ local itemUI = script.Parent
 
 -- RemoteEvent
 local UseItemEvent = game.ReplicatedStorage:WaitForChild("UseItemEvent")
-local DumpItemEvent = game.ReplicatedStorage:WaitForChild("DumpItemEvent")
 
-
---[I am here! ]--
 
 
 -- ModuleScript
 local playerItemData = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerItemData"))
-local itemConfigs = require(game.ReplicatedStorage.Config.ItemConfigs)
+local itemConfigs = require(game.ReplicatedStorage.Config:WaitForChild("ItemConfigs"))
 
 -- 当前选择的宠物ID
 local currentSelectItemID = 0
@@ -92,7 +89,7 @@ local function Init(inFight, opponentID, monsterID)
     end
     itemInfoItemList = {}
     local index = 1
-    while (index <= #cnturreItemData.ownedItemList) do
+    while (index <= #currentItemData.ownedItemList) do
         local itemInfoItem = {}
         local itemInfoObj = itemUI.Root.MainFrame.ItemList.ItemInfo:Clone()
         itemInfoObj.Visible = true
@@ -100,7 +97,7 @@ local function Init(inFight, opponentID, monsterID)
         local itemConfig = itemConfigs.ItemConfig[currentItemData.ownedItemList[index].templateID]
         -- 若在战斗中打开，只显示可使用道具
         if inFight then
-            while (~itemConfig.usable and index <= #currentItemData.ownedItemList)do
+            while (not itemConfig.usable and index <= #currentItemData.ownedItemList)do
                 index = index + 1
             end
         end
@@ -134,17 +131,17 @@ local function Init(inFight, opponentID, monsterID)
         RefreshItemInfoFrame(currentItemData.ownedItemList[1], currentItemInfo.obj)
         ]]--
     -- end
-    player.PlayerGui.item.Enabled = true
+    itemUI.Enabled = true
 end
 
 --[[
 	对外接口，打开宠物UI
 ]]--
-function ItemUIModule:OpenUItoCheck()
+function ItemUIModule:openUItoCheck()
     Init(false, 0, 0)
 end
 
-function ItemUIModule:OpenUItoFight(opponentID, monsterID)
+function ItemUIModule:openUItoFight(opponentID, monsterID)
     Init(true, opponentID, monsterID)
 end
 
@@ -156,7 +153,7 @@ end
 	对战调用时，点击使用按钮响应
 	若点击时没有选定，则不使用道具（暂时如此）
 ]]--
-ItemUI.Root.MainFrame.ItemInfoFrame.UseButton.MouseButton1Click:Connect(function()
+itemUI.Root.MainFrame.ItemInfoFrame.UseButton.MouseButton1Click:Connect(function()
     UseItemEvent:FireServer(currentSelectItemID, OpponentID, MonsterID)
 end)
 

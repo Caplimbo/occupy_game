@@ -1,6 +1,6 @@
-local AllMonsterModule = {}
+local MonsterConfigs = {}
 
-AllMonsterModule.monsters = {}
+MonsterConfigs.monsterConfig = {}
 
 monsterNum = 2
 
@@ -19,15 +19,15 @@ modelNameList = {
     [2] = "mon2",
 }
 
--- initialize all monsters
+-- initialize all monsterConfig
 -- monster has attack, defense, ?health, model
 for id=1, #attackList do
-    AllMonsterModule.monsters[id] = {attack = attackList[id], defense = defenseList[id],
+    MonsterConfigs.monsterConfig[id] = {attack = attackList[id], defense = defenseList[id],
                                      modelName = modelNameList[id]}
 end
 
 
 
-return AllMonsterModule
+return MonsterConfigs
 
 

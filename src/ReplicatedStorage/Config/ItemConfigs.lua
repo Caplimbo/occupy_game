@@ -1,6 +1,6 @@
-local AllItemModule = {}
+local ItemConfigs = {}
 
-AllItemModule.items = {}
+ItemConfigs.itemConfig = {}
 
 itemNum = 2
 
@@ -39,19 +39,20 @@ deactivate = {
 }
 
 ModelName = {
-    [1] = "item",
-    [2] = "item",
+    [1] = "item1",
+    [2] = "item2",
 }
 
--- initialize all items, currently 2
+-- initialize all itemConfig, currently 2
 -- Each item has activate(player) and deactivate(player) method.
 -- player no need character
 for i=1, #activate do
-    AllItemModule.items[i] = {activateFun = activate[i], deactivateFun = deactivate[i], modelName = ModelName[i]}
+    ItemConfigs.itemConfig[i] = {id = i, activateFun = activate[i], deactivateFun = deactivate[i],
+                                 modelName = ModelName[i], desc = "this is the description for item"..i, usable = true}
 end
 
 
 
-return AllItemModule
+return ItemConfigs
 
 

@@ -13,8 +13,8 @@ local PlayerItemDataModule = {}
 local ItemInfoEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
 ItemInfoEvent.Name = "ItemInfoEvent"
 
-local EquipItemEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
-EquipItemEvent.Name = "UseItemEvent"
+local UseItemEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
+UseItemEvent.Name = "UseItemEvent"
 
 -- ModuleScript
 local itemConfigs = require(game.ReplicatedStorage.Config.ItemConfigs)
@@ -28,7 +28,6 @@ PlayerItemDataModule.res = -1
 -- 查找列表，只是为了加快查找速度，道具很多时有用
 local ownedItemLookUpDictList = {}
 
-playerControlModule = require(game.ServerScriptService.Modules.PlayerItemDataModule)
 
 -- ================================================================================
 -- FUNCTIONS
@@ -73,7 +72,7 @@ function PlayerItemDataModule:AddItem(player, id)
         playerItemData.maxItemID = playerItemData.maxItemID + 1
         table.insert(playerItemData.ownedItemList, {ID = playerItemData.maxItemID, templateID = itemConfigs.ItemConfig[id].ID})
         ownedItemLookUpDict[playerItemData.maxItemID] = itemConfigs.ItemConfig[id].ID
-        ItemInfoEvent:FireClient(player, playerItemData.ownedItemList, playerItemData.currentItemList, playerItemData.canEquipNum)
+        ItemInfoEvent:FireClient(player, playerItemData.ownedItemList)
         ownedItemLookUpDictList[player.UserId] = ownedItemLookUpDict
     end
 end
@@ -121,7 +120,6 @@ end
 ]]--
 local function PlayerAdd(player)
     player.CharacterAdded:Connect(CharacterAdded)
-    player.CharacterRemoving:Connect(CharacterRemoving)
 end
 
 --[[
@@ -140,6 +138,7 @@ end
 -- ================================================================================
 -- CONNECTIONS
 -- ================================================================================
+
 game.Players.PlayerAdded:Connect(PlayerAdd)
 game.Players.PlayerRemoving:Connect(PlayerExit)
 
@@ -159,14 +158,14 @@ UseItemEvent.OnServerEvent:Connect(function(player, itemID, opponentID, monsterI
             -- 这里怎么获得实际的id呢？目前暂时让item建表时两个id必须匹配
 
             -- 如何阻塞直到对手也完成激活？
-            itemConfig = GetItemConfigByItemID(player, itemID)
+            local itemConfig = PlayerItemDataModule:GetItemConfigByItemID(player, itemID)
 
             -- 激活，战斗，取消效果
             itemConfig.activateFun(player)
             if opponentID == 0 then
-                PlayerItemDataModule.res = playerControlModule:fightWithMonster(player, monsterID)
+                PlayerItemDataModule.res = game.ServerScriptService.Modules.PlayerItemDataModule:fightWithMonster(player, monsterID)
             else
-                PlayerItemDataModule.res = playerControlModule:fightWithPlayer(player, opponentID)
+                PlayerItemDataModule.res = game.ServerScriptService.Modules.PlayerItemDataModule:fightWithPlayer(player, opponentID)
             end
             itemConfig.deactivateFun(player)
 
@@ -186,3 +185,4 @@ UseItemEvent.OnServerEvent:Connect(function(player, itemID, opponentID, monsterI
     end
 end)
 
+return PlayerItemDataModule
