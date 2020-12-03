@@ -24,7 +24,7 @@ local UseItemEvent = game.ReplicatedStorage:WaitForChild("UseItemEvent")
 
 -- ModuleScript
 local playerItemData = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerItemData"))
-local itemConfigs = require(game.ReplicatedStorage.Config:WaitForChild("ItemConfigs"))
+local itemConfigs = require(game.ReplicatedStorage.Config.ItemConfigs)
 
 -- 当前选择的宠物ID
 local currentSelectItemID = 0
@@ -35,14 +35,6 @@ local itemInfoItemList = {}
 -- 对手信息
 local OpponentID = 0
 local MonsterID = 0
-
--- 等待宠物信息
-wait()
-local testBaseData = playerItemData:GetBaseData()
-while testBaseData == nil do
-    wait()
-    testBaseData = playerItemData:GetBaseData()
-end
 
 -- ================================================================================
 -- FUNCTIONS
@@ -63,7 +55,7 @@ local function RefreshItemInfoFrame(itemData, itemInfoObj)
     itemInfoObj.Select.Visible = true
     itemInfoObj.Bg.Visible = false
 
-    local itemConfig = itemConfigs.ItemConfig[itemData.templateID]
+    local itemConfig = itemConfigs.itemConfig[itemData.templateID]
     -- 显示选中道具的信息
     itemUI.Root.MainFrame.ItemInfoFrame.ItemDesc:FindFirstChild("Description").Text = itemConfig.desc
 
@@ -94,10 +86,10 @@ local function Init(inFight, opponentID, monsterID)
         local itemInfoObj = itemUI.Root.MainFrame.ItemList.ItemInfo:Clone()
         itemInfoObj.Visible = true
         itemInfoObj.Parent = itemUI.Root.MainFrame.ItemList
-        local itemConfig = itemConfigs.ItemConfig[currentItemData.ownedItemList[index].templateID]
+        local itemConfig = itemConfigs.itemConfig[currentItemData.ownedItemList[index].templateID]
         -- 若在战斗中打开，只显示可使用道具
         if inFight then
-            while (not itemConfig.usable and index <= #currentItemData.ownedItemList)do
+            while ((not itemConfig.usable) and index <= #currentItemData.ownedItemList)do
                 index = index + 1
             end
         end
@@ -108,12 +100,13 @@ local function Init(inFight, opponentID, monsterID)
 
         itemInfoItemList[itemInfoItem.id] = itemInfoItem
 
-
+        local lindex = index
         --绑定点击事件
         itemInfoObj.Button.MouseButton1Click:Connect(function()
             -- 展示道具信息
-            RefreshItemInfoFrame(currentItemData.ownedItemList[index], itemInfoObj)
+            RefreshItemInfoFrame(currentItemData.ownedItemList[lindex], itemInfoObj)
         end)
+
         index = index + 1
     end
 
@@ -131,19 +124,10 @@ local function Init(inFight, opponentID, monsterID)
         RefreshItemInfoFrame(currentItemData.ownedItemList[1], currentItemInfo.obj)
         ]]--
     -- end
+    print("begin enable")
     itemUI.Enabled = true
 end
 
---[[
-	对外接口，打开宠物UI
-]]--
-function ItemUIModule:openUItoCheck()
-    Init(false, 0, 0)
-end
-
-function ItemUIModule:openUItoFight(opponentID, monsterID)
-    Init(true, opponentID, monsterID)
-end
 
 -- ================================================================================
 -- CONNECTIONS
@@ -154,7 +138,20 @@ end
 	若点击时没有选定，则不使用道具（暂时如此）
 ]]--
 itemUI.Root.MainFrame.ItemInfoFrame.UseButton.MouseButton1Click:Connect(function()
+    print("click!")
     UseItemEvent:FireServer(currentSelectItemID, OpponentID, MonsterID)
 end)
+
+game.ReplicatedStorage.OpenUIInFightEvent.OnClientEvent:Connect(function(opponentID, monsterID)
+    Init(true, opponentID, monsterID)
+end)
+
+--[[
+	点击关闭按钮响应
+]]--
+itemUI.Root.CloseButton.MouseButton1Click:Connect(function()
+    itemUI.Enabled = false
+end)
+
 
 return ItemUIModule

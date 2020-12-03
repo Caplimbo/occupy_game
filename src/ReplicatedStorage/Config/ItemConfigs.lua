@@ -43,12 +43,17 @@ ModelName = {
     [2] = "item2",
 }
 
+icons = {
+    [1] = "rbxassetid://4633238082",
+    [2] = "rbxassetid://4633237956"
+}
+
 -- initialize all itemConfig, currently 2
 -- Each item has activate(player) and deactivate(player) method.
 -- player no need character
 for i=1, #activate do
-    ItemConfigs.itemConfig[i] = {id = i, activateFun = activate[i], deactivateFun = deactivate[i],
-                                 modelName = ModelName[i], desc = "this is the description for item"..i, usable = true}
+    ItemConfigs.itemConfig[i] = {ID = i, name = "item"..tostring(i), activateFun = activate[i], deactivateFun = deactivate[i],
+                                 modelName = ModelName[i], desc = "this is the description for item"..i, usable = true, icon = icons[i]}
 end
 
 
