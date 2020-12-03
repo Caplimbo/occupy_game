@@ -6,8 +6,6 @@ fightMobilityCost = 1
 local OpenUIEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
 OpenUIEvent.Name = "OpenUIEvent"
 
-local EndTurnEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
-EndTurnEvent.Name = "EndTurnEvent"
 
 playerItemDataModule = require(game.ServerScriptService.Modules.PlayerItemDataModule)
 
@@ -122,10 +120,6 @@ function PlayerControlModule:fightWithMonster(player, monsterID)
     return 1
 end
 
-EndTurnEvent.OnServerEvent:Connect(function(player)
-    local allPlayers=game.Players:GetChildren()
 
-    return 1
-end)
 
 return PlayerControlModule
