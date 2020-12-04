@@ -1,23 +1,25 @@
 local PlayerControlModule = {}
 
-fightMobilityCost = 1
+local fightMobilityCost = 1
 
 -- remoteEvent
-local OpenUIEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
-OpenUIEvent.Name = "OpenUIEvent"
+local OpenUIInFightEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
+OpenUIInFightEvent.Name = "OpenUIInFightEvent"
 
+local EndTurnEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
+EndTurnEvent.Name = "EndTurnEvent"
 
 playerItemDataModule = require(game.ServerScriptService.Modules.PlayerItemDataModule)
 
 function PlayerControlModule:rightClickOnBrick(player, part)
     -- check valid move
     -- same brick, no action
-    if player.Character.currentPartID.Value == part.Name or player.inAction.Character.Value then
+    if player.currentPartID.Value == part.Name or player.inAction.Value or not player.start then
         return 0
     end
     -- need to be adjacent bricks
     local newID = tonumber(part.Name)
-    local originalID = tonumber(player.Character.currentPartID.Value)
+    local originalID = tonumber(player.currentPartID.Value)
     if newID ~= originalID + 10 and newID ~= originalID + 1 and newID ~= originalID - 10 and newID ~= originalID -1 then
         print("invalid move!")
         return -1
@@ -30,28 +32,27 @@ function PlayerControlModule:rightClickOnBrick(player, part)
         attachedMobilityRequirement = fightMobilityCost
     end
     local neededMobility = part.mobilityRequirement.Value + attachedMobilityRequirement
-    if player.Character.mobility.Value < neededMobility then
+    if player.mobility.Value < neededMobility then
         print("Lack of mobility!")
         return -1
     end
 
-    player.Character.inAction.Value = true
+    player.inAction.Value = true
     local humanoid = player.Character:WaitForChild("Humanoid")
     -- move to the target brick
     humanoid:MoveTo(part.Position)
-    player.Character.mobility.Value = player.Character.mobility.Value - part.mobilityRequirement.Value
-    -- temporary line here!
-    player.Character.currentPartID.Value = part.Name
+    player.mobility.Value = player.mobility.Value - part.mobilityRequirement.Value
 
     local res = -1
 
     -- check if there is a fight
     -- with another player
     if part.playerID.Value ~= 0 then
-        player.Character.mobility.Value = player.Character.mobility.Value - fightMobilityCost
-        print("current mobility "..player.Character.mobility.Value)
-        game.ReplicatedStorage.OpenUIEvent:FireClient(player,part.playerID.Value, 0)
+        player.mobility.Value = player.mobility.Value - fightMobilityCost
+        print("current mobility "..player.mobility.Value)
+        game.ReplicatedStorage.OpenUIInFightEvent:FireClient(player,part.playerID.Value, 0)
         while (res == -1) do
+            print("wait for fight result with player "..part.playerID.Value)
             wait(1)
             res = playerItemDataModule.res
         end
@@ -60,32 +61,35 @@ function PlayerControlModule:rightClickOnBrick(player, part)
     -- with a monster
     if part.monsterID.Value ~= 0 then
         print("fight with a monster!")
-        player.Character.mobility.Value = player.Character.mobility.Value - fightMobilityCost
-        game.ReplicatedStorage.OpenUIEvent:FireClient(player, 0, part.monsterID.Value)
+        player.mobility.Value = player.mobility.Value - fightMobilityCost
+        game.ReplicatedStorage.OpenUIInFightEvent:FireClient(player, 0, part.monsterID.Value)
         while (res == -1) do
-            print("In loop!")
+            print("wait for fight result with monster "..part.monsterID.Value)
             wait(1)
             res = playerItemDataModule.res
         end
-        print("end of fight! You win.")
     end
 
+    local originalPlayerPartID = player.currentPartID.Value
+    local originalPart = workspace:WaitForChild(originalPlayerPartID)
 
     -- if being defeat, retreat to original brick
     if res == 0 then
-        local originalPlayerPartID = player.currentPartID.Value
-        local originalPart = workspace:WaitForChild(originalPlayerPartID)
+        print("You lossssssse!")
         humanoid:MoveTo(originalPart.Position)
-        player.Character.inAction.Value = false
+        player.inAction.Value = false
         return 0
     end
 
     -- successfully landed
+    playerItemDataModule.res = -1
+    originalPart.playerID.Value = 0
     part.monsterID.Value = 0
     part.playerID.Value = player.userId
     playerItemDataModule.res = -1
-    player.Character.currentPartID.Value = part.Name
-    print("currentPartID is ".. player.Character.currentPartID.Value)
+    player.currentPartID.Value = part.Name
+    print("currentPartID is ".. player.currentPartID.Value)
+    print("player left part "..originalPart.Name.." with now playerid ".. originalPart.playerID.Value)
 
     -- collect item on the brick
     if part.itemID.Value ~= 0 then
@@ -97,17 +101,18 @@ function PlayerControlModule:rightClickOnBrick(player, part)
     PlayerControlModule:gainEnergy(player, part)
 
     -- successfully arrived!
-    player.Character.inAction.Value = false
+    player.inAction.Value = false
     return 1
 end
 
 
 function PlayerControlModule:collectItem(player, itemID)
-    playerItemDataModule:addItem(player, itemID)
+    print("begin collecting item "..itemID)
+    playerItemDataModule:AddItem(player, itemID)
 end
 
 function PlayerControlModule:gainEnergy(player, part)
-    player.Character.energyStorage.Value = player.Character.energyStorage.Value + part.energy.Value
+    player.energyStorage.Value = player.energyStorage.Value + part.energy.Value
     print("gained"..tostring(part.energy.Value).."energy")
     part.energy.Value = 0
 end
@@ -119,7 +124,6 @@ end
 function PlayerControlModule:fightWithMonster(player, monsterID)
     return 1
 end
-
 
 
 return PlayerControlModule

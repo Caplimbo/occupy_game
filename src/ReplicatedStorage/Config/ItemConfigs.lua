@@ -6,35 +6,31 @@ itemNum = 2
 
 activate = {
     [1] = function(player)
-        local u = player.character
         print("begin to increase attack!")
-        print("Original attack is ", u.Attack.Value)
-        u.Attack.Value = u.Attack.Value + 5
-        print("Revised attack is ", u.Attack.Value)
+        print("Original attack is ", player.attack.Value)
+        player.attack.Value = player.attack.Value + 5
+        print("Revised attack is ", player.attack.Value)
     end,
     [2] = function(player)
-        local u = player.character
         print("begin to increase defense!")
-        print("Original defense is ", u.Defense.Value)
-        u.Defense.Value = u.Defense.Value + 5
-        print("Revised defense is ", u.Defense.Value)
+        print("Original defense is ", player.defense.Value)
+        player.defense.Value = player.defense.Value + 5
+        print("Revised defense is ", player.defense.Value)
     end,
 }
 
 deactivate = {
     [1] = function(player)
-        local u = player.character
         print("begin to decrease attack!")
-        print("Original attack is ", u.Attack.Value)
-        u.Attack.Value = u.Attack.Value - 5
-        print("Revised attack is ", u.Attack.Value)
+        print("Original attack is ", player.attack.Value)
+        player.attack.Value = player.attack.Value - 5
+        print("Revised attack is ", player.attack.Value)
     end,
     [2] = function(player)
-        local u = player.character
         print("begin to decrease defense!")
-        print("Original defense is ", u.Defense.Value)
-        u.Defense.Value = u.Defense.Value - 5
-        print("Revised defense is ", u.Defense.Value)
+        print("Original defense is ", player.defense.Value)
+        player.defense.Value = player.defense.Value - 5
+        print("Revised defense is ", player.defense.Value)
     end,
 }
 
@@ -53,8 +49,7 @@ icons = {
 -- player no need character
 for i=1, #activate do
     ItemConfigs.itemConfig[i] = {ID = i, name = "item"..tostring(i), activateFun = activate[i], deactivateFun = deactivate[i],
-                                 modelName = ModelName[i], desc = "this is the description for item"..i, usable = true,
-                                 icon = icons[i], passive = false, used = false}
+                                 modelName = ModelName[i], desc = "this is the description for item"..i, usable = true, icon = icons[i]}
 end
 
 

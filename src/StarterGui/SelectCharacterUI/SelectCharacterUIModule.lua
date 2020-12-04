@@ -70,6 +70,7 @@ local function Init(inFight, opponentID, monsterID)
     for key, value in pairs(itemInfoItemList) do
         value.obj:Destroy()
     end
+
     local currentItemData = playerItemData:GetBaseData()
     if inFight then
         itemUI.Root.MainFrame.ItemInfoFrame.UseButton.Visible = true
@@ -113,11 +114,9 @@ local function Init(inFight, opponentID, monsterID)
     -- 默认选中1号物品，暂时注释掉，不太合理，若需要则点开if和else注释
     -- if #currentItemData.ownedItemList == 0 then
     currentSelectItemID = 0
+    itemInfoItemList = {}
     itemUI.Root.MainFrame.ItemInfoFrame.ItemDesc:FindFirstChild("Description").Text = ""
 
-    if #currentItemData.ownedItemList == 0 then
-        itemInfoItemList = {}
-    end
     --[[
     else
         currentSelectItemID = currentItemData.ownedItemList[1].ID

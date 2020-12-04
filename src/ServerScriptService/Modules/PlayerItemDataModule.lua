@@ -143,6 +143,16 @@ game.Players.PlayerAdded:Connect(PlayerAdd)
 game.Players.PlayerRemoving:Connect(PlayerExit)
 
 
+function PlayerItemDataModule:fightWithPlayer(player, opponentID)
+    return 1
+end
+
+function PlayerItemDataModule:fightWithMonster(player, monsterID)
+    print("fight with a monster!")
+    return 0
+end
+
+
 --[[
 	监听客户端使用道具消息
 	player 玩家
@@ -157,20 +167,20 @@ UseItemEvent.OnServerEvent:Connect(function(player, itemID, opponentID, monsterI
             -- 战斗
 
             local itemConfig = PlayerItemDataModule:GetItemConfigByItemID(player, itemID)
-
             -- 激活，战斗，取消效果
             print("begin fight")
             itemConfig.activateFun(player)
             if opponentID == 0 then
-                PlayerItemDataModule.res = game.ServerScriptService.Modules.PlayerItemDataModule:fightWithMonster(player, monsterID)
+                PlayerItemDataModule.res = PlayerItemDataModule:fightWithMonster(player, monsterID)
             else
-                PlayerItemDataModule.res = game.ServerScriptService.Modules.PlayerItemDataModule:fightWithPlayer(player, opponentID)
+                PlayerItemDataModule.res = PlayerItemDataModule:fightWithPlayer(player, opponentID)
             end
             itemConfig.deactivateFun(player)
 
             -- 删除道具
             for index = 1, #playerItemData.ownedItemList, 1 do
                 if playerItemData.ownedItemList[index].ID == itemID then
+                    print("deleting item !")
                     table.remove(playerItemData.ownedItemList, index)
                     ownedItemLookUpDict[itemID] = nil
                     break
@@ -181,7 +191,6 @@ UseItemEvent.OnServerEvent:Connect(function(player, itemID, opponentID, monsterI
                 UseItemEvent:FireClient(player, itemID, playerItemData.ownedItemList)
             end)
         end
-        PlayerItemDataModule.res = 1
     end
 end)
 

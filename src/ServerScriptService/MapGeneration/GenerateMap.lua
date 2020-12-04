@@ -52,7 +52,6 @@ function randomTableGeneration(num, max)
     res = {}
     local ran = 0
     local i = 1
-    math.randomseed(os.time())
     for index = 1, max do
         ran = math.random()
         -- actually should check whether exceed limit, revise later!
@@ -67,6 +66,7 @@ function randomTableGeneration(num, max)
 end
 
 -- generate monsters, items on the map
+math.randomseed(os.time())
 monsterTable = randomTableGeneration(monsterNum, rowNum*colNum)
 itemTable = randomTableGeneration(itemNum, rowNum*colNum)
 
@@ -128,12 +128,21 @@ for x=1, rowNum do
 
         -- add models to bricks
         if monsterID.Value ~= 0 then
-            local monsterConfig = monsterConfigs.monsterConfig[monsterTable[brickID]]
+            local monsterConfig = monsterConfigs.monsterConfig[monsterID.Value]
             monster = game.ReplicatedStorage.Monster[monsterConfig.modelName]:Clone()
             monster.Parent = game.Workspace.Monster
             monster.MonsterName.TextLabel.Text = monsterConfig.modelName
             monster:MoveTo(Vector3.new((x-5)*brickSideLength + 0.5*(x-5), brickHeight/2 + 5, (y-5)*brickSideLength + 0.5*(y-5)))
             --monster:SetPrimaryPartCFrame(CFrame.new(part.Position))
+        end
+
+        -- add items to bricks
+        if itemID.Value ~= 0 then
+            local itemConfig = itemConfigs.itemConfig[itemID.Value]
+            item = game.ReplicatedStorage.Item[itemConfig.modelName]:Clone()
+            item.Parent = game.Workspace.Item
+            item.ItemName.TextLabel.Text = itemConfig.modelName
+            item:MoveTo(Vector3.new((x-5)*brickSideLength + 0.5*(x-5), brickHeight/2 + 5, (y-5)*brickSideLength + 0.5*(y-5)))
         end
     end
 end

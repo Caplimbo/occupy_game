@@ -14,7 +14,7 @@ local readyPlayerNum = 0
 
 NextTurnEvent.OnServerEvent:Connect(function(player)
     local allPlayers=game.Players:GetChildren()
-    player.Character.nextTurn.Value = true
+    player.nextTurn.Value = true
     readyPlayerNum = readyPlayerNum + 1
     if readyPlayerNum == #allPlayers then
         print("Next Turn Begins!")
@@ -33,9 +33,9 @@ NextTurnEvent.OnServerEvent:Connect(function(player)
                     itemConfig.used = true
                 end
             end
-            p.Character.mobility.Value = p.Character.maxMobility.Value
+            p.mobility.Value = p.maxMobility.Value
             -- 玩家在结束回合后不能动，需要额外代码吗？
-            -- people[i].Character.endTurn.Value = false
+            -- people[i].endTurn.Value = false
         end
         -- 重新开始回合结束计数
         readyPlayerNum = 0
