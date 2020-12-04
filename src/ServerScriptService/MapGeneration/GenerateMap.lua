@@ -104,6 +104,17 @@ for x=1, rowNum do
         mobilityRequirement.Name = "mobilityRequirement"
         mobilityRequirement.Value = math.random(2)
 
+        -- occupy status of the brick
+        occupyPlayer = Instance.new("IntValue")
+        occupyPlayer.Parent = part
+        occupyPlayer.Name = "occupyPlayer"
+        occupyPlayer.Value = 0
+
+        occupyLevel = Instance.new("IntValue")
+        occupyLevel.Parent = part
+        occupyLevel.Name = "occupyLevel"
+        occupyLevel.Value = 0
+
         -- player on the brick
         playerID = Instance.new("IntValue")
         playerID.Parent = part
@@ -130,7 +141,8 @@ for x=1, rowNum do
         if monsterID.Value ~= 0 then
             local monsterConfig = monsterConfigs.monsterConfig[monsterID.Value]
             monster = game.ReplicatedStorage.Monster[monsterConfig.modelName]:Clone()
-            monster.Parent = game.Workspace.Monster
+            monster.Parent = part
+            monster.Name = "Monster"
             monster.MonsterName.TextLabel.Text = monsterConfig.modelName
             monster:MoveTo(Vector3.new((x-5)*brickSideLength + 0.5*(x-5), brickHeight/2 + 5, (y-5)*brickSideLength + 0.5*(y-5)))
             --monster:SetPrimaryPartCFrame(CFrame.new(part.Position))
@@ -140,7 +152,8 @@ for x=1, rowNum do
         if itemID.Value ~= 0 then
             local itemConfig = itemConfigs.itemConfig[itemID.Value]
             item = game.ReplicatedStorage.Item[itemConfig.modelName]:Clone()
-            item.Parent = game.Workspace.Item
+            item.Parent = part
+            item.Name = "Item"
             item.ItemName.TextLabel.Text = itemConfig.modelName
             item:MoveTo(Vector3.new((x-5)*brickSideLength + 0.5*(x-5), brickHeight/2 + 5, (y-5)*brickSideLength + 0.5*(y-5)))
         end

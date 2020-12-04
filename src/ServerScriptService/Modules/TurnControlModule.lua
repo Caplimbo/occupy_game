@@ -9,7 +9,7 @@ local playerItemDataModule = require(game.ServerScriptService.Modules.PlayerItem
 local itemConfigs = require(game.ReplicatedStorage.Config.ItemConfigs)
 
 local totalTurnNum = 1
-
+local MaxTurnNum = 100
 local readyPlayerNum = 0
 
 NextTurnEvent.OnServerEvent:Connect(function(player)
@@ -19,6 +19,12 @@ NextTurnEvent.OnServerEvent:Connect(function(player)
     if readyPlayerNum == #allPlayers then
         print("Next Turn Begins!")
         totalTurnNum = totalTurnNum + 1 -- 总回合数+1
+        if totalTurnNum == MaxTurnNum then
+            -- 结束游戏，检查占点
+            print("game ends at turn "..totalTurnNum)
+            return 0
+        end
+
         -- 设置每个玩家新回合的相关参数
         for i=1, #allPlayers do
             local p = allPlayers[i]

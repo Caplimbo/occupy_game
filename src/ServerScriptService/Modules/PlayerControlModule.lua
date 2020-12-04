@@ -82,6 +82,9 @@ function PlayerControlModule:rightClickOnBrick(player, part)
     end
 
     -- successfully landed
+    if part.monsterID.Value ~= 0 then
+        part.Monster:Destroy()
+    end
     playerItemDataModule.res = -1
     originalPart.playerID.Value = 0
     part.monsterID.Value = 0
@@ -95,6 +98,7 @@ function PlayerControlModule:rightClickOnBrick(player, part)
     if part.itemID.Value ~= 0 then
         PlayerControlModule:collectItem(player, part.itemID.Value) -- collect
         part.itemID.Value = 0 -- eliminate item from the brick
+        part.Item:Destroy()
     end
 
     -- extract energy
@@ -117,13 +121,6 @@ function PlayerControlModule:gainEnergy(player, part)
     part.energy.Value = 0
 end
 
-function PlayerControlModule:fightWithPlayer(player, opponentID)
-    return 1
-end
-
-function PlayerControlModule:fightWithMonster(player, monsterID)
-    return 1
-end
 
 
 return PlayerControlModule

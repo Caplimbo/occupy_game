@@ -11,6 +11,7 @@ TeamControlModule.TeamStatusList[2] = {maxMobility = 3, attack = 20, defense = 1
 TeamControlModule.TeamStatusList[3] = {maxMobility = 4, attack = 15, defense = 5, health = 100, startLocation = '99'}
 
 
+
 SelectTeamEvent.OnServerEvent:Connect(function(player, teamID)
     -- 玩家的队伍选择后，将玩家的各属性直接保存在player下
     local mobility=Instance.new("IntValue");		--行动力
@@ -38,7 +39,9 @@ SelectTeamEvent.OnServerEvent:Connect(function(player, teamID)
     start.Name = "start"
     start.Value = false
 
+
     -- 各阵营不同的属性
+    -- 可以统一一下，比如阵营提供基础数值，角色提供额外bonus？
     local maxMobility=Instance.new("IntValue");		--最大行动力
     maxMobility.Parent=player;
     maxMobility.Name="maxMobility";
