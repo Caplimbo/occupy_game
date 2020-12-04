@@ -69,6 +69,9 @@ SelectTeamEvent.OnServerEvent:Connect(function(player, teamID)
     local humanoid = player.Character:WaitForChild("Humanoid")
     -- 理论上不能用moveTo……
     humanoid:moveTo(initialPart.Position)
+
+    -- 让玩家开始选择角色
+    game.ReplicatedStorage.OpenCharacterUIEvent:FireClient(player, teamID)
 end)
 
 return TeamControlModule
