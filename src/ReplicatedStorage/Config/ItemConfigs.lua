@@ -53,7 +53,8 @@ icons = {
 -- player no need character
 for i=1, #activate do
     ItemConfigs.itemConfig[i] = {ID = i, name = "item"..tostring(i), activateFun = activate[i], deactivateFun = deactivate[i],
-                                 modelName = ModelName[i], desc = "this is the description for item"..i, usable = true, icon = icons[i]}
+                                 modelName = ModelName[i], desc = "this is the description for item"..i, usable = true,
+                                 icon = icons[i], passive = false, used = false}
 end
 
 
