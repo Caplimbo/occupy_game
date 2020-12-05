@@ -80,7 +80,15 @@ for x=1, rowNum do
         clickDetector.RightMouseClick:connect(function (player)
             playerControlModule:rightClickOnBrick(player, part)
         end)
-        -- right click, move?
+        clickDetector.MouseHoverEnter:Connect(function(player)
+            message = "Monster: "..part.monsterID.Value.."\nPlayer: "..part.playerID.Value..
+                    "\n Require Mobility: "..part.mobilityRequirement.Value
+            game.ReplicatedStorage.ShowInfoBoardEvent:FireClient(player, part.Name, message)
+        end)
+
+        clickDetector.MouseHoverLeave:Connect(function(player)
+            game.ReplicatedStorage.HideInfoBoardEvent:FireClient(player)
+        end)
         --clickDetector.MouseClick:connect(showInfoOfBrick()) -- left click, show detailed info
 
         -- set basic properties

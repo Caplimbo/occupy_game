@@ -1,12 +1,19 @@
 local OccupyStatusControlModule = {}
 
 -- remote event
-occupyPartEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
-occupyPartEvent.Name = "occupyPartEvent"
+OccupyPartEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
+OccupyPartEvent.Name = "OccupyPartEvent"
+
 
 OccupyStatusControlModule.occupyStatusList = {}
 
 OccupyStatusControlModule.occupyBigPartNumList = {}
+
+local BrickColorForTeams = {
+    [1] = BrickColor.Blue(),
+    [2] = BrickColor.Yellow(),
+    [3] = BrickColor.Black(),
+}
 
 -- 游戏开始时要调用！！
 function OccupyStatusControlModule: init()
@@ -131,20 +138,58 @@ function updateOccupyStatusWhenTaken(player, partID)
     end
 end
 
-occupyPartEvent.OnServerEvent:Connect(function(player, partId)
+OccupyPartEvent.OnServerEvent:Connect(function(player)
+    -- 本地以进行行动力的判断
+
+    local partId = player.currentPartID.Value
+    -- 检查是否可以进行占领
+    local part = workspace:WaitForChild(partId)
+    -- 若块为自己占领的或未被占领
+    if part.occupyPlayer.Value == player.UserId or part.occupyPlayer.Value == 0 then
+        part.occupyPlayer.Value = player.UserId
+        part.occupyLevel.Value = part.occupyLevel.Value + player.mobility.Value
+        player.mobility.Value = 0
+        part.BrickColor = BrickColorForTeams[player.team.Value]
+        player.controlPartNum.Value = player.controlPartNum.Value + 1
+        -- 块本来是别人的
+    else
+        part.occupyLevel.Value = part.occupyLevel.Value - player.mobility.Value
+        player.mobility.Value = 0
+        if part.occupyLevel.Value == 0 then -- 归属权恰好被抵消
+            local originalPlayer = game.Players:GetPlayerByUserId(part.occupyPlayer.Value)
+            deOccupyPart(originalPlayer, partId)
+            originalPlayer.controlPartNum = originalPlayer.controlPartNum - 1
+            part.occupyPlayer.Value = 0
+        elseif part.occupyLevel.Value < 0 then -- 归属权转换
+            part.occupyLevel.Value = -part.occupyLevel.Value
+            local originalPlayer = game.Players:GetPlayerByUserId(part.occupyPlayer.Value)
+            deOccupyPart(originalPlayer, partId)
+            originalPlayer.controlPartNum = originalPlayer.controlPartNum - 1
+            part.occupyPlayer.Value = player.UserId
+            occupyPart(player, partId)
+            part.BrickColor = BrickColorForTeams[player.team.Value]
+            player.controlPartNum.Value = player.controlPartNum.Value + 1
+        end
+    end
+end)
+
+-- 用户占点后针对大点占据情况的判断
+function occupyPart(player, partId)
     if OccupyStatusControlModule.occupyBigPartNumList[player.UserId] >= 3 then
         return
     end
     local partID = tonumber(partId)
     local flag = updateOccupyStatusWhenTake(player, partID)
     if flag then
-       OccupyStatusControlModule.occupyBigPartNumList[player.UserId] = OccupyStatusControlModule.occupyBigPartNumList[player.UserId] + 1
-       -- fireClient 小地图做相应操作
+        OccupyStatusControlModule.occupyBigPartNumList[player.UserId] = OccupyStatusControlModule.occupyBigPartNumList[player.UserId] + 1
+        -- fireClient 小地图做相应操作
+        local partNum = OccupyStatusControlModule.occupyBigPartNumList[player.UserId]
+        print("You have occupy "..partNum.." giant part!")
     end
+end
 
-end)
-
-deOccupyPartEvent.OnServerEvent:Connect(function(player, partId)
+-- 用户占点后，原用户控制点被占去后的处理
+function deOccupyPart(player, partId)
     if OccupyStatusControlModule.occupyBigPartNumList[player.UserId] >= 3 then
         return
     end
@@ -154,6 +199,6 @@ deOccupyPartEvent.OnServerEvent:Connect(function(player, partId)
         OccupyStatusControlModule.occupyBigPartNumList[player.UserId] = OccupyStatusControlModule.occupyBigPartNumList[player.UserId] - 1
         -- fireClient 小地图做相应操作
     end
-end)
+end
 
 return OccupyStatusControlModule

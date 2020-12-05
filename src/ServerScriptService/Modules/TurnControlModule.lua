@@ -3,6 +3,7 @@ local TurnControlModule = {}
 -- remote event
 local NextTurnEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
 NextTurnEvent.Name = "NextTurnEvent"
+local OpenOccupyUIEvent = game.ReplicatedStorage.OpenOccupyUIEvent
 
 -- require modules
 local playerItemDataModule = require(game.ServerScriptService.Modules.PlayerItemDataModule)
@@ -28,6 +29,8 @@ NextTurnEvent.OnServerEvent:Connect(function(player)
         -- 设置每个玩家新回合的相关参数
         for i=1, #allPlayers do
             local p = allPlayers[i]
+            -- 打开占点UI
+            OpenOccupyUIEvent:FireClient(p)
             -- 应当检查被动道具来更新玩家的其他属性，待完成
             -- 首先需要重置所有可能被修改过的变量？
             local itemList = playerItemDataModule:GetPlayerData(p).ownedItemList

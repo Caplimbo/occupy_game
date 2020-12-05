@@ -190,6 +190,12 @@ UseItemEvent.OnServerEvent:Connect(function(player, itemID, opponentID, monsterI
             spawn(function()
                 UseItemEvent:FireClient(player, itemID, playerItemData.ownedItemList)
             end)
+        else
+            if opponentID == 0 then
+                PlayerItemDataModule.res = PlayerItemDataModule:fightWithMonster(player, monsterID)
+            else
+                PlayerItemDataModule.res = PlayerItemDataModule:fightWithPlayer(player, opponentID)
+            end
         end
     end
 end)

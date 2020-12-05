@@ -39,9 +39,18 @@ SelectTeamEvent.OnServerEvent:Connect(function(player, teamID)
     start.Name = "start"
     start.Value = false
 
+    local controlPartNum = Instance.new("IntValue")
+    controlPartNum.Parent = player
+    controlPartNum.Name = "controlPartNum"
+    controlPartNum.Value = 0
 
     -- 各阵营不同的属性
     -- 可以统一一下，比如阵营提供基础数值，角色提供额外bonus？
+    local team = Instance.new("IntValue")
+    team.Parent = player
+    team.Name = team
+    team.Value = teamID
+
     local maxMobility=Instance.new("IntValue");		--最大行动力
     maxMobility.Parent=player;
     maxMobility.Name="maxMobility";

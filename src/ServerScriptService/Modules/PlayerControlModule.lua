@@ -9,6 +9,8 @@ OpenUIInFightEvent.Name = "OpenUIInFightEvent"
 local EndTurnEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
 EndTurnEvent.Name = "EndTurnEvent"
 
+local CloseOccupyUIEvent = game.ReplicatedStorage.CloseOccupyUIEvent
+
 playerItemDataModule = require(game.ServerScriptService.Modules.PlayerItemDataModule)
 
 function PlayerControlModule:rightClickOnBrick(player, part)
@@ -103,6 +105,11 @@ function PlayerControlModule:rightClickOnBrick(player, part)
 
     -- extract energy
     PlayerControlModule:gainEnergy(player, part)
+
+    -- 当行动力为0时，关闭占点UI
+    if player.mobility == 0 then
+        CloseOccupyUIEvent:FireClient(player)
+    end
 
     -- successfully arrived!
     player.inAction.Value = false
