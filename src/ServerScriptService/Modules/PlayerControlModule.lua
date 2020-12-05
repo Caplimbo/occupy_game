@@ -107,7 +107,7 @@ function PlayerControlModule:rightClickOnBrick(player, part)
     PlayerControlModule:gainEnergy(player, part)
 
     -- 当行动力为0时，关闭占点UI
-    if player.mobility == 0 then
+    if player.mobility.Value == 0 then
         CloseOccupyUIEvent:FireClient(player)
     end
 

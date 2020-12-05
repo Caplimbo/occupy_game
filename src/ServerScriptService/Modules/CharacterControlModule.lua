@@ -3,6 +3,7 @@ local CharacterControlModule = {}
 --modules
 OccupyStatusControlModule = require(game.ServerScriptService.Modules.OccupyStatusControlModule)
 
+
 local selectedPlayerNum = 0
 -- configs
 local characterConfigs = require(game.ReplicatedStorage.Config.CharacterConfigs)
@@ -18,10 +19,14 @@ SelectCharacterEvent.OnServerEvent:Connect(function(player, selectCharacterID, t
     local character = characterConfigs.CharacterConfig[teamID][selectCharacterID]
 
     selectedPlayerNum = selectedPlayerNum + 1
+    player.start.Value = true
     -- 所有写完后取消注释
     --[[
-    if selectedPlayerNum == 3 then
+    if selectedPlayerNum == 3 then -- 全部玩家都准备完了
         OccupyStatusControlModule:init()
+        for _, player in pairs(game.Players:GetPlayers()) do
+            player.start.Value = true
+        end
     end
     ]]--
     OccupyStatusControlModule:init()

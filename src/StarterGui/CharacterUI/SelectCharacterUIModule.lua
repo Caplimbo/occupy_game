@@ -80,17 +80,12 @@ local function Init(teamID)
     characterUI.Enabled = true
 end
 
-
--- ================================================================================
--- CONNECTIONS
--- ================================================================================
-
---[[
-	对战调用时，点击使用按钮响应
-	若点击时没有选定，则不使用角色（暂时如此）
-]]--
 characterUI.Root.MainFrame.CharacterInfoFrame.ChooseButton.MouseButton1Click:Connect(function()
     print("choose character! ")
+    if currentSelectCharacterID == 0 then
+        print("please choose a character!")
+        return
+    end
     SelectCharacterEvent:FireServer(currentSelectCharacterID, TeamID)
     characterUI.Enabled = false
 end)
