@@ -1,5 +1,9 @@
 local CharacterControlModule = {}
 
+--modules
+OccupyStatusControlModule = require(game.ServerScriptService.Modules.OccupyStatusControlModule)
+
+local selectedPlayerNum = 0
 -- configs
 local characterConfigs = require(game.ReplicatedStorage.Config.CharacterConfigs)
 
@@ -12,7 +16,18 @@ OpenCharacterUIEvent.Name = "OpenCharacterUIEvent"
 
 SelectCharacterEvent.OnServerEvent:Connect(function(player, selectCharacterID, teamID)
     local character = characterConfigs.CharacterConfig[teamID][selectCharacterID]
+
+    selectedPlayerNum = selectedPlayerNum + 1
+    -- 所有写完后取消注释
+    --[[
+    if selectedPlayerNum == 3 then
+        OccupyStatusControlModule:init()
+    end
+    ]]--
+    OccupyStatusControlModule:init()
+
     character.activateFun(player, teamID, selectCharacterID)
+    -- 直接在模块中先初始化，这里注释掉
 end)
 
 

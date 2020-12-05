@@ -1,5 +1,7 @@
 local TeamControlModule = {}
 
+
+
 -- remote event
 local SelectTeamEvent = Instance.new("RemoteEvent", game.ReplicatedStorage)
 SelectTeamEvent.Name = "SelectTeamEvent"
@@ -9,6 +11,8 @@ TeamControlModule.TeamStatusList = {}
 TeamControlModule.TeamStatusList[1] = {maxMobility = 3, attack = 20, defense = 10, health = 100, startLocation = '55'}
 TeamControlModule.TeamStatusList[2] = {maxMobility = 3, attack = 20, defense = 10, health = 100, startLocation = '11'}
 TeamControlModule.TeamStatusList[3] = {maxMobility = 4, attack = 15, defense = 5, health = 100, startLocation = '99'}
+
+local selectedPlayerNum = 0
 
 
 
@@ -48,7 +52,7 @@ SelectTeamEvent.OnServerEvent:Connect(function(player, teamID)
     -- 可以统一一下，比如阵营提供基础数值，角色提供额外bonus？
     local team = Instance.new("IntValue")
     team.Parent = player
-    team.Name = team
+    team.Name = "team"
     team.Value = teamID
 
     local maxMobility=Instance.new("IntValue");		--最大行动力
@@ -84,6 +88,8 @@ SelectTeamEvent.OnServerEvent:Connect(function(player, teamID)
 
     -- 让玩家开始选择角色
     game.ReplicatedStorage.OpenCharacterUIEvent:FireClient(player, teamID)
+
+    table.remove(TeamControlModule.TeamStatusList, teamID)
 end)
 
 return TeamControlModule

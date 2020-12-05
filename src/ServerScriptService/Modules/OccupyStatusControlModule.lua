@@ -16,15 +16,20 @@ local BrickColorForTeams = {
 }
 
 -- 游戏开始时要调用！！
-function OccupyStatusControlModule: init()
-    local allPlayers=game.Players:GetChildren()
-    for p = 1, #allPlayers do
-        OccupyStatusControlModule.occupyBigPartNumList[allPlayers[p].UserId] = 0
+function OccupyStatusControlModule:init()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        OccupyStatusControlModule.occupyBigPartNumList[player.UserId] = 0
+        OccupyStatusControlModule.occupyStatusList[player.UserId] = {}
         for index=1, 9 do
-            OccupyStatusControlModule.occupyStatusList[allPlayers[p].UserId][index] = 0
+            OccupyStatusControlModule.occupyStatusList[player.UserId][index] = 0
         end
     end
 
+end
+
+
+for _, value in pairs(OccupyStatusControlModule.occupyBigPartNumList) do
+    print("value is "..value)
 end
 
 function testNumInTable(num, table)
@@ -80,6 +85,7 @@ function updateOccupyStatusWhenTake(player, partID)
         end
     elseif testNumInTable(partID, {77, 78, 79, 87, 88, 89, 97, 98, 99}) then
         playerOccupyStatus[9] = playerOccupyStatus[9] + 1
+        print("occupying region 9 with currently "..playerOccupyStatus[9].." parts taken")
         if playerOccupyStatus[9] == 5 then
             return true
         end
@@ -150,6 +156,7 @@ OccupyPartEvent.OnServerEvent:Connect(function(player)
         part.occupyLevel.Value = part.occupyLevel.Value + player.mobility.Value
         player.mobility.Value = 0
         part.BrickColor = BrickColorForTeams[player.team.Value]
+        occupyPart(player, partId)
         player.controlPartNum.Value = player.controlPartNum.Value + 1
         -- 块本来是别人的
     else
