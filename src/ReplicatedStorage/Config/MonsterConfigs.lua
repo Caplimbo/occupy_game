@@ -2,7 +2,7 @@ local MonsterConfigs = {}
 
 MonsterConfigs.monsterConfig = {}
 
-monsterNum = 2
+MonsterConfigs.allMonsterNum = 2
 
 attackList = {
     [1] = 10,
@@ -21,7 +21,7 @@ modelNameList = {
 
 -- initialize all monsterConfig
 -- monster has attack, defense, ?health, model
-for id=1, #attackList do
+for id=1, MonsterConfigs.allMonsterNum do
     MonsterConfigs.monsterConfig[id] = {attack = attackList[id], defense = defenseList[id],
                                      modelName = modelNameList[id]}
 end

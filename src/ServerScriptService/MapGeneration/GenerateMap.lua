@@ -15,32 +15,41 @@ brickHeight = mapConfigs.brickHeight
 -- the Num of items & monsters that need to generate
 itemNum = 2
 monsterNum = 2
+allItemNum = itemConfigs.allItemNum
+allMonsterNum = monsterConfigs.allMonsterNum
 
 maxEnergyLevel = 100
 
+local function getRandomNumList(len)
+    local rsList = {}
+    for i=1, len do
+        table.insert(rsList,i)
+    end
+    local num,tmp
+    for i = 1,len do
+        num = math.random(1,len)
+        tmp = rsList[i]
+        rsList[i] = rsList[num]
+        rsList[num] = tmp
+    end
+    return rsList
+end
+
+
 -- randomly generate items/monsters to brickID
-function randomTableGeneration_alternate(num, max)
+function randomTableGeneration(num, indexNum, max)
     -- num: num of items/monsters that needs generation
     -- max: num of bricks
+    print("generating!")
     local flag = true
     res = {}
     local ran = 0
     local i = 1
-    math.randomseed(os.time())
-    while #res < num do
-        print()
-        flag = true
-        ran = math.random(1, max)
-        for index, v in ipairs(res) do
-            if ran == v then
-                flag = false
-                break
-            end
-        end
-        if flag then
-            res[ran] = i -- store the id of the object, need to change to random gen later
-            i = i+1
-        end
+    local ranIndexList = getRandomNumList(indexNum)
+    local ranTargetList = getRandomNumList(max)
+    for index=1, num do
+        print("index "..ranIndexList[index].."with target "..ranTargetList[index])
+        res[ranIndexList[index]] = ranTargetList[index]
     end
     return res
 end
@@ -48,7 +57,7 @@ end
 
 -- alternate generation method: each block has a 0.2 possibility of having item/monster
 -- if use this, give all bricks monsterID and itemID.
-function randomTableGeneration(num, max)
+function randomTableGeneration_alternate(num, max)
     res = {}
     local ran = 0
     local i = 1
@@ -67,8 +76,8 @@ end
 
 -- generate monsters, items on the map
 math.randomseed(os.time())
-monsterTable = randomTableGeneration(monsterNum, rowNum*colNum)
-itemTable = randomTableGeneration(itemNum, rowNum*colNum)
+monsterTable = randomTableGeneration(monsterNum, rowNum*colNum, allMonsterNum)
+itemTable = randomTableGeneration(itemNum, rowNum*colNum, allItemNum)
 
 
 -- generate the map
@@ -131,7 +140,8 @@ for x=1, rowNum do
 
         local brickID = (x-1)*colNum + y
         -- generate items
-        --if monsterTable[brickID] ~= nil then
+        -- use the following code if use _alternate method
+        --[[
         monsterID = Instance.new("IntValue")
         monsterID.Parent = part
         monsterID.Name = "monsterID"
@@ -144,6 +154,26 @@ for x=1, rowNum do
         itemID.Name = "itemID"
         itemID.Value = itemTable[brickID]
         --end
+        ]]--
+
+        monsterID = Instance.new("IntValue")
+        monsterID.Parent = part
+        monsterID.Name = "monsterID"
+        if not monsterTable[brickID] then
+            monsterID.Value = 0
+        else
+            monsterID.Value = monsterTable[brickID]
+        end
+
+        itemID = Instance.new("IntValue")
+        itemID.Parent = part
+        itemID.Name = "itemID"
+        if not itemTable[brickID] then
+            itemID.Value = 0
+        else
+            itemID.Value = itemTable[brickID]
+        end
+
 
         -- add models to bricks
         if monsterID.Value ~= 0 then

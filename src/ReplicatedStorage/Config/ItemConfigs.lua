@@ -2,7 +2,7 @@ local ItemConfigs = {}
 
 ItemConfigs.itemConfig = {}
 
-itemNum = 2
+ItemConfigs.allItemNum = 2
 
 activate = {
     [1] = function(player)
@@ -47,7 +47,7 @@ icons = {
 -- initialize all itemConfig, currently 2
 -- Each item has activate(player) and deactivate(player) method.
 -- player no need character
-for i=1, #activate do
+for i=1, ItemConfigs.allItemNum do
     ItemConfigs.itemConfig[i] = {ID = i, name = "item"..tostring(i), activateFun = activate[i], deactivateFun = deactivate[i],
                                  modelName = ModelName[i], desc = "this is the description for item"..i, usable = true, icon = icons[i]}
 end
