@@ -17,6 +17,10 @@ OpenCharacterUIEvent.Name = "OpenCharacterUIEvent"
 
 SelectCharacterEvent.OnServerEvent:Connect(function(player, selectCharacterID, teamID)
     local character = characterConfigs.CharacterConfig[teamID][selectCharacterID]
+    local c = Instance.new("IntValue")
+    c.Parent = player
+    c.Name = "character"
+    c.Value = selectCharacterID
 
     selectedPlayerNum = selectedPlayerNum + 1
     player.start.Value = true

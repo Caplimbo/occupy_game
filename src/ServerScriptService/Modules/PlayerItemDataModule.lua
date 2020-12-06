@@ -18,6 +18,7 @@ UseItemEvent.Name = "UseItemEvent"
 
 -- ModuleScript
 local itemConfigs = require(game.ReplicatedStorage.Config.ItemConfigs)
+local monsterConfigs = require(game.ReplicatedStorage.Config.MonsterConfigs)
 
 -- 所有玩家的道具数据列表
 local playerItemDataList = {}
@@ -142,13 +143,61 @@ end
 game.Players.PlayerAdded:Connect(PlayerAdd)
 game.Players.PlayerRemoving:Connect(PlayerExit)
 
+local standardP2PDamage = 40
+local defenseBonus = 5
 
 function PlayerItemDataModule:fightWithPlayer(player, opponentID)
-    return 1
+    -- 可以加一个fraction参数，设置伤害修正
+
+    local opponent = game.Players:GetPlayerByUserId(opponentID)
+
+    -- 战时属性设置，这里可以判断角色技能
+    local playerAttack = player.attack.Value
+    local playerDefense = player.defense.Value
+    local opponentAttack = opponent.attack.Value
+    local opponentDefense = opponent.defense.Value + defenseBonus
+
+    -- 计算伤害
+    local playerHealthLost = (opponentAttack - playerDefense) / (opponentAttack - playerDefense
+    + playerAttack - opponentDefense) * standardP2PDamage
+    local opponentHealthLost = (playerAttack - opponentDefense) / (opponentAttack - playerDefense
+            + playerAttack - opponentDefense) * standardP2PDamage
+    player.health.Value = player.health.Value - playerHealthLost
+    opponent.health.Value = opponent.health.Value - opponentHealthLost
+    if player.health.Value < 0 then
+        print("player died")
+        -- sent player his lose message
+    end
+    -- 对战结果
+    if opponent.health.Value < 0 then
+        print("opponent died")
+        -- sent opponent his lose message
+    end
+    if playerHealthLost > opponentHealthLost then
+        return 0
+    else
+        return 1
+    end
 end
 
 function PlayerItemDataModule:fightWithMonster(player, monsterID)
+    local monster = monsterConfigs.monsterConfig[monsterID]
     print("fight with a monster!")
+    local playerHealth = player.health.Value
+    local monsterHealth = monster.health
+    while (true) do
+        monsterHealth = monsterHealth - (player.attack.Value - monster.defense)
+        if monsterHealth <= 0 then
+            player.health.Value = player.health.Value - 0.1*(player.health.Value - playerHealth)
+            return 1
+        end
+        playerHealth = playerHealth - (monster.attack - player.defense.Value)
+        if playerHealth <= 0 then
+            player.health.Value = player.health.Value - 0.3*(player.health.Value - playerHealth)
+            monster.health = monsterHealth
+            return 0
+        end
+    end
     return 0
 end
 
